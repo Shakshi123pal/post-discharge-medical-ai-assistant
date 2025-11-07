@@ -1,0 +1,23 @@
+# Virtual env
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+logs/
+
+# Chroma vector database
+app/rag/store/
+
+# Streamlit cache
+frontend/__pycache__/
+.streamlit/
+
+# OS/Editor garbage
+.DS_Store
+*.swp
+*.swo
