@@ -22,14 +22,14 @@ This project delivers a minimal, safe AI system that:
 
 We designed a **two-agent LangGraph architecture**:
 
-### ✅ Receptionist Agent
+###  Receptionist Agent
 - Checks if the user has provided a name  
 - Verifies patient identity  
 - Retrieves the patient's discharge report  
 - Asks follow-up questions based on report  
 - Routes clinical messages to the Clinical Agent  
 
-### ✅ Clinical Agent
+###  Clinical Agent
 - Extracts medical intent  
 - Runs RAG over *Comprehensive Clinical Nephrology (7e)*  
 - Provides grounded, citation-backed answers  
@@ -81,14 +81,14 @@ Receptionist Agent
 
 ## 5. Tools
 
-### ✅ Patient Data Tool  
+###  Patient Data Tool  
 - Retrieves synthetic patient records (diagnosis, meds, dates, warnings)
 
-### ✅ RAG Tool  
+###  RAG Tool  
 - ChromaDB + MiniLM embeddings  
 - Fast semantic search over nephrology reference  
 
-### ✅ Web Search Tool  
+###  Web Search Tool  
 - DuckDuckGo API  
 - Used only when RAG confidence is low  
 
@@ -136,7 +136,7 @@ All core functionality works end-to-end.
 
 ---
 
-## ✅ Conclusion
+##  Conclusion
 
 This submission provides a **clean, modular, safe, production-style mini-assistant**.  
 The system is grounded in a trusted nephrology reference, uses clear agent routing,  
