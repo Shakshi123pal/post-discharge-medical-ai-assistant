@@ -4,7 +4,7 @@ For educational use only. Not for clinical decision-making.
 
 This project implements a lightweight medical assistance system designed for post-discharge patients. It uses LangGraph to route between a Receptionist Agent (identity + triage) and a Clinical Agent (RAG over nephrology textbook + web fallback). A FastAPI backend and Streamlit UI provide a clean, demo-ready experience.
 
-✅ Key Features
+##  Key Features
 
 25+ synthetic patient records (JSONL)
 
@@ -32,116 +32,60 @@ Citations shown for each RAG answer
 
 Separation of concerns in clean module structure
 
-✅ Architecture Overview
-                                ┌───────────────────────────┐
-                                │            User            │
-                                │  • Enters name             │
-                                │  • Sends message / query   │
-                                └──────────────┬─────────────┘
-                                               │ (1)
-                                               │ User input
-                                               ▼
-                                ┌───────────────────────────┐
-                                │        Streamlit UI       │
-                                │  • Collects input          │
-                                │  • Sends POST /chat        │
-                                └──────────────┬─────────────┘
-                                               │ (2)
-                           POST /chat JSON:    │
-                           {                    │
-                             "user_name": "...",
-                             "user_message": "..."
-                           }
-                                               ▼
-                       ┌──────────────────────────────────────────┐
-                       │               FastAPI Backend            │
-                       │     /chat → calls LangGraph workflow     │
-                       └──────────────┬───────────────────────────┘
-                                      │ (3)
-                                      ▼
-                          ┌────────────────────────┐
-                          │     LangGraph DAG      │
-                          │  (Conversation Engine) │
-                          └──────────┬─────────────┘
-                                     │ Route based on message
-     ┌──────────────────────────────┬┴───────────────────────────────┐
-     │                              │                                │
-     ▼                              ▼                                ▼
-┌────────────────┐         ┌────────────────────┐        ┌────────────────────────────┐
-│Receptionist    │         │ Clinical Agent      │        │   Future Agents (optional) │
-│Agent           │         │ (Medical Query)     │        │   • Pharmacy Agent         │
-│• Identity check│         │ • Symptom analysis  │        │   • Billing Agent          │
-│• Match patient │         │ • RAG over textbook │        │   • Lab Reports Agent      │
-│• Greeting flow │         │ • Web fallback      │        │                            │
-└───────┬────────┘         └───────────┬──────────┘        └────────────────────────────┘
-        │ (4)                           │ (5)
-        ▼                               ▼
-┌────────────────┐             ┌──────────────────────────────┐
-│ PatientDB      │             │   RAG Engine (ChromaDB)       │
-│ local JSONL    │             │ • MiniLM embeddings           │
-│ • Diagnosis    │             │ • Chunked nephrology text     │
-│ • Medications  │             │ • Citation metadata           │
-└────────────────┘             └──────────┬────────────────────┘
-                                          │ (6) If no RAG match
-                                          ▼
-                            ┌──────────────────────────────────┐
-                            │     DuckDuckGo Web Search Tool   │
-                            │ • Retrieves latest medical info  │
-                            └──────────────────────────────────┘
+##  Architecture Overview
 
-                                               │
-                                               ▼
-                     ┌──────────────────────────────────────────┐
-                     │     FastAPI returns structured JSON      │
-                     │   { answer, from_source, citations,... } │
-                     └──────────────────────────────────────────┘
-                                               │ (7)
-                                               ▼
-                                ┌───────────────────────────┐
-                                │        Streamlit UI       │
-                                │  • Shows answer            │
-                                │  • Shows citations         │
-                                └──────────────┬─────────────┘
-                                               │ (8)
-                                               ▼
-                                ┌───────────────────────────┐
-                                │            User            │
-                                │   Reads final response     │
-                                └───────────────────────────┘
+The system follows a simple multi-agent pipeline:
 
-✅ Repository Structure
+User  
+ → Streamlit UI  
+ → FastAPI backend (/chat)  
+ → LangGraph workflow  
+       ├── Receptionist Agent  
+       │     • Identifies patient  
+       │     • Retrieves discharge report (PatientDB)  
+       │     • Asks follow-up question  
+       │     • Routes medical queries  
+       │  
+       └── Clinical Agent  
+             • RAG over nephrology reference (ChromaDB)  
+             • Web search fallback (DuckDuckGo)  
+             • Returns answer + citations  
+
+The final response is sent back to Streamlit UI for display.
+
+
+## Repository Structure
+
 datasmith-pdc-assistant/
 │
 ├── app/
-│   ├── main.py                # FastAPI app + endpoint
-│   ├── graph.py               # LangGraph workflow
-│   ├── schemas.py             # Pydantic models
-│   ├── logging_conf.py        # JSON logging
-│   └── tools/
-│       ├── patient_db.py      # Patient lookup tool
-│       ├── rag_tool.py        # RAG search tool
-│       └── web_search.py      # Web fallback tool
-│
-├── app/rag/store/             # ChromaDB vector store (autogenerated)
+│   ├── main.py            # FastAPI app + /chat route
+│   ├── graph.py           # LangGraph workflow
+│   ├── schemas.py         # Pydantic models
+│   ├── logging_conf.py    # JSON + file logging
+│   ├── tools/
+│   │   ├── patient_db.py  # Patient lookup tool
+│   │   ├── rag_tool.py    # RAG search tool
+│   │   └── web_search.py  # Web fallback tool
+│   └── rag/store/         # ChromaDB (generated, ignored in Git)
 │
 ├── Scripts/
-│   ├── ingest_pdf.py          # Chunk + embed PDF into ChromaDB
-│   └── make_dummy_patients.py # Generate 30 synthetic patient reports
+│   ├── ingest_pdf.py      # PDF chunk + embedding
+│   └── make_dummy_patients.py
 │
 ├── data/
 │   ├── patients.jsonl
 │   └── comprehensive-clinical-nephrology.pdf
 │
-├── frontend/
-│   └── app.py                 # Streamlit UI
+├── frontend/app.py        # Streamlit UI
 │
-├── tests/
-│   └── smoke_test.py
+├── tests/smoke_test.py
 │
-├── .env.example
-├── requirements.txt
 ├── README.md
-└── BRIEF_REPORT.md
+├── BRIEF_REPORT.md
+├── .env.example
+└── requirements.txt
+
 
 ✅ Setup Instructions
 1. Create Virtual Environment
