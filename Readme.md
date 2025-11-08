@@ -56,6 +56,7 @@ The final response is sent back to Streamlit UI for display.
 
 ## Repository Structure
 
+```
 datasmith-pdc-assistant/
 │
 ├── app/
@@ -77,14 +78,18 @@ datasmith-pdc-assistant/
 │   ├── patients.jsonl
 │   └── comprehensive-clinical-nephrology.pdf
 │
-├── frontend/app.py        # Streamlit UI
+├── frontend/
+│   └── app.py             # Streamlit UI
 │
-├── tests/smoke_test.py
+├── tests/
+│   └── smoke_test.py
 │
 ├── README.md
 ├── BRIEF_REPORT.md
 ├── .env.example
 └── requirements.txt
+```
+
 
 
 ✅ Setup Instructions
