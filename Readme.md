@@ -79,17 +79,17 @@ datasmith-pdc-assistant/
 
 
 
-✅ Setup Instructions
+## Setup Instructions
 1. Create Virtual Environment
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
 
-✅ Data Preparation
-1️⃣ Generate dummy patient data
+## Data Preparation
+1️ Generate dummy patient data
 python Scripts/make_dummy_patients.py
 
-2️⃣ Build RAG vector store
+2️ Build RAG vector store
 python Scripts/ingest_pdf.py --pdf data/comprehensive-clinical-nephrology.pdf
 
 
@@ -97,7 +97,7 @@ This creates the Chroma vector store at:
 
 app/rag/store/
 
-✅ Running the App
+## Running the App
 Start Backend
 uvicorn app.main:api --reload --port 8000
 
@@ -112,7 +112,7 @@ streamlit run frontend/app.py
 UI opens at:
 👉 http://localhost:8501
 
-✅ API Endpoint
+## API Endpoint
 POST /chat
 
 Input:
@@ -132,7 +132,7 @@ Output:
   "patient_found": true
 }
 
-✅ Logging
+## Logging
 
 Every turn produces structured logs:
 
@@ -143,7 +143,7 @@ Every turn produces structured logs:
   "citations": ["chunk_888", "chunk_1638"]
 }
 
-✅ Testing
+## Testing
 pytest -q
 
 
@@ -155,6 +155,6 @@ patient lookup
 
 clinical handoff RAG/web
 
-✅ License
+## License
 
 For educational demonstration only.
