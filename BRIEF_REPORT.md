@@ -1,135 +1,144 @@
-Technical Brief — Post-Discharge Medical AI Assistant
-1. Problem
+# Technical Brief — Post-Discharge Medical AI Assistant
 
-Patients discharged from hospitals often forget instructions, miss warning signs, or misunderstand symptoms. The goal is to develop a minimal, safe system that:
+## 1. Problem
 
-retrieves the patient's discharge data,
+Post-discharge patients often:
 
-answers follow-up questions,
+- forget instructions  
+- miss early warning signs  
+- misunderstand symptoms  
+- fail to follow medication schedules  
 
-provides verified nephrology information using RAG,
+This project delivers a minimal, safe AI system that:
 
-and falls back to web search when the reference text is insufficient.
+- retrieves patient discharge data  
+- answers follow-up questions  
+- provides nephrology-grounded answers using RAG  
+- uses web search when textbook info is insufficient  
 
-2. Approach
+---
 
-We designed a two-agent architecture using LangGraph:
+## 2. Approach
 
-✅ Receptionist Agent
+We designed a **two-agent LangGraph architecture**:
 
-Checks if the user has given a name
+### ✅ Receptionist Agent
+- Checks if the user has provided a name  
+- Verifies patient identity  
+- Retrieves the patient's discharge report  
+- Asks follow-up questions based on report  
+- Routes clinical messages to the Clinical Agent  
 
-Verifies patient identity
+### ✅ Clinical Agent
+- Extracts medical intent  
+- Runs RAG over *Comprehensive Clinical Nephrology (7e)*  
+- Provides grounded, citation-backed answers  
+- Uses DuckDuckGo for questions outside the reference  
+- Returns structured response + citations  
 
-Retrieves discharge details
+---
 
-Routes conversation to clinical agent if symptoms are mentioned
+## 3. Knowledge Base Construction
 
-✅ Clinical Agent
+- Nephrology PDF cleaned and chunked into **~12,140 segments**  
+- MiniLM (`all-MiniLM-L6-v2`) used for embeddings  
+- Indexed with **ChromaDB** (batch ingestion enabled)  
+- Each chunk stored with metadata:
 
-Extracts clinical context
+```
+{
+  "source": "textbook",
+  "chunk_id": 4723,
+  "page_hint": "approximate location"
+}
+```
 
-Runs RAG over Comprehensive Clinical Nephrology (7e)
+---
 
-Provides grounded, cited responses
+## 4. LangGraph DAG Architecture
 
-Falls back to DuckDuckGo when needed
-
-3. Knowledge Base Construction
-
-PDF cleaned and chunked into ~12k segments
-
-Embeddings generated using all-MiniLM-L6-v2
-
-Indexed via ChromaDB with batch ingestion
-
-Chunks include metadata:
-
-source = textbook
-
-page_hint = chunk index
-
-4. DAG Architecture (LangGraph)
+```
 START
   │
   ▼
 Receptionist Agent
   │ is_clinical?
-  ├── NO → respond as receptionist
-  └── YES
-         │
-         ▼
-    Clinical Agent
-     (RAG / Web Fallback)
-  │
-END
+  ├── NO  → receptionist response
+  └── YES → Clinical Agent
+                 │
+                 ▼
+         RAG → or → Web Fallback
+                 │
+                END
+```
 
+**Benefits:**
+- Deterministic routing  
+- High debuggability  
+- Easy to extend with more agents (pharmacy, labs, billing)  
 
-Benefits:
+---
 
-Deterministic routing
+## 5. Tools
 
-Highly debuggable
+### ✅ Patient Data Tool  
+- Retrieves synthetic patient records (diagnosis, meds, dates, warnings)
 
-Easy to expand (add pharmacy/lab agents)
+### ✅ RAG Tool  
+- ChromaDB + MiniLM embeddings  
+- Fast semantic search over nephrology reference  
 
-5. Tools
-✅ Patient Data Tool
+### ✅ Web Search Tool  
+- DuckDuckGo API  
+- Used only when RAG confidence is low  
 
-Retrieves synthetic patient report (diagnosis, labs, dates).
+---
 
-✅ RAG Tool
+## 6. System Interface
 
-ChromaDB + MiniLM embeddings for fast semantic search.
+- **FastAPI backend** exposes the `/chat` endpoint  
+- **Streamlit frontend** provides user-facing UI  
+- **JSON logs** for every turn  
+- Logging includes: routing, citations, patient lookup, tools used  
 
-✅ Web Search Tool
+---
 
-DuckDuckGo with safe search.
+## 7. Safety Measures
 
-6. System Interface
+- No prescribing or diagnosis  
+- Purely reference-based information  
+- Citations shown transparently  
+- Web results clearly labelled  
+- "Educational use only" warnings added  
 
-FastAPI backend exposes /chat
+---
 
-Streamlit frontend
+## 8. Evaluation
 
-JSON logs for every turn
+Basic smoke tests validate:
 
-7. Safety Measures
+- Missing name → receptionist requests identity  
+- Valid patient → correct discharge report retrieval  
+- Symptom message → routed to Clinical Agent  
+- RAG hit → “reference” + citations returned  
+- No RAG hit → Web search fallback  
 
-No prescribing, no diagnosis
+All core functionality works end-to-end.
 
-Pure reference-based responses
+---
 
-Citations displayed
+## 9. Future Work
 
-Transparent fallback
+- Add lightweight symptom classifier  
+- Add mini-LLM summarization  
+- Add longitudinal patient timeline  
+- Monitoring dashboards and analytics  
 
-Educational use disclaimers
+---
 
-8. Evaluation
+## ✅ Conclusion
 
-Smoke tests ensure:
+This submission provides a **clean, modular, safe, production-style mini-assistant**.  
+The system is grounded in a trusted nephrology reference, uses clear agent routing,  
+and delivers all mandatory assignment features — fully implemented and verified.
 
-Identity missing → receptionist prompt
-
-Valid patient name → record retrieval
-
-Symptom message → clinical routing
-
-RAG available → reference source
-
-No RAG hit → web fallback
-
-9. Future Work
-
-Add symptom classifier
-
-Add small LLM for summarization
-
-Add patient history timeline view
-
-Add monitoring dashboards
-
-✅ Conclusion
-
-The submission delivers a clean, modular, safe, and production-style mini-assistant. The architecture is extensible, transparent, and grounded in an authoritative reference. All mandatory features have been implemented and verified.
