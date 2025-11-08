@@ -1,36 +1,23 @@
-Post-Discharge Medical AI Assistant (RAG + LangGraph)
+# Post-Discharge Medical AI Assistant (RAG + LangGraph)
 
-For educational use only. Not for clinical decision-making.
+**For educational use only. Not for clinical decision-making.**
 
-This project implements a lightweight medical assistance system designed for post-discharge patients. It uses LangGraph to route between a Receptionist Agent (identity + triage) and a Clinical Agent (RAG over nephrology textbook + web fallback). A FastAPI backend and Streamlit UI provide a clean, demo-ready experience.
+This project implements a lightweight medical assistance system designed for post-discharge patients. It uses **LangGraph** to route between a **Receptionist Agent** (identity + triage) and a **Clinical Agent** (RAG over nephrology textbook + web fallback). A FastAPI backend and Streamlit UI provide a clean, demo-ready experience.
 
-##  Key Features
+##  Features
 
-25+ synthetic patient records (JSONL)
+- Multi-Agent system using **LangGraph**
+- **Receptionist Agent**: identity handling, patient lookup, follow-up conversation
+- **Clinical Agent**: medical question answering using RAG + Web fallback
+- RAG over **Nephrology Reference Book** (12k+ chunks)
+- **ChromaDB vector store** with MiniLM embeddings
+- Web search fallback (DuckDuckGo API)
+- JSON file-based patient database (30 dummy reports)
+- FastAPI backend + Streamlit frontend UI
+- Structured JSON logging (console + rotating log file)
+- Fully self-contained POC
 
-Nephrology RAG using Comprehensive Clinical Nephrology (7e)
-
-Chunked embedding indexing with ChromaDB
-
-Receptionist agent (identity + record lookup)
-
-Clinical agent (RAG → web fallback)
-
-DuckDuckGo web search
-
-Structured logging (JSON)
-
-Streamlit web UI
-
-FastAPI backend
-
-LangGraph DAG-based workflow
-
-Batch ingestion for large PDFs
-
-Citations shown for each RAG answer
-
-Separation of concerns in clean module structure
+---
 
 ##  Architecture Overview
 
