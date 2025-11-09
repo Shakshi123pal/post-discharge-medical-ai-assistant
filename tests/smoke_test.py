@@ -1,3 +1,5 @@
+import sys, os
+sys.path.append(os.path.abspath("."))
 from fastapi.testclient import TestClient
 from app.main import api
 
